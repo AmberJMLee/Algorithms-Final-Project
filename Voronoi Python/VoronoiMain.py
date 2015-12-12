@@ -8,11 +8,8 @@ import doctest
 from itertools import permutations
 from PIL import Image
 from voronoiCell import *
-from matplotlib.tri import Triangulation, UniformTriRefiner,\
-    CubicTriInterpolator
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-from matplotlib.patches import RegularPolygon
+from matplotlib.tri import Triangulation
+
 voronoiLines = [] #This will contain all of the lines that were generated from the Green and Gibson algorithm
 voronoiCells = []
 
@@ -132,7 +129,7 @@ def reload(self, imageName):
 
     for triangle in triangles:
         self.w.create_polygon([xarray[triangle[0]], 1000 - yarray[triangle[0]]], [xarray[triangle[1]], 1000 - yarray[triangle[1]]], [xarray[triangle[2]], 1000 - yarray[triangle[2]]], fill=random.choice(color))
-        #print(triangle)
+        print(xarray[triangle[0])
     #plt.figure()
     #plt.gca().set_aspect('equal')
     #plt.triplot(triangulation)
@@ -166,10 +163,10 @@ def intersects(l1, l2):
     b1 = l1_starty - m1*l1_startx
     b2 = l2_starty - m2*l2_startx
 
-    if m1==m2 && b1 != b2:
-        return false
+    if m1==m2 & b1 != b2:
+        return False
     else:
-        return true
+        return True
 
 
 def window_close():
