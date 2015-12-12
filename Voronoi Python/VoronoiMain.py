@@ -9,6 +9,7 @@ from itertools import permutations
 from PIL import Image
 from voronoiCell import *
 from matplotlib.tri import Triangulation
+import numpy as np
 
 voronoiLines = [] #This will contain all of the lines that were generated from the Green and Gibson algorithm
 voronoiCells = []
@@ -87,7 +88,7 @@ class Window():
         self.entry.pack(side=TOP,padx=10,pady=10)
         def onok():
             imageName = self.entry.get()
-            print(imageName)
+            #print(imageName)
             reload(self, imageName)
             self.w.after(100, onok)
         Button(root, text='Exit', command=window_close).pack(side=BOTTOM)
@@ -119,17 +120,28 @@ def reload(self, imageName):
                 all_pixels.append(255)
                 points.append(Point(x*2, y*2))
                 xarray.append(x*2)
-                yarray.append(1000 - y*2)
+                yarray.append(y*2)
                 #self.w.create_oval(x*2, y*2, x*2+1, y*2+1, fill="black")
             else:
                 all_pixels.append(0)
     triangulation = Triangulation(xarray, yarray)
     triangles = triangulation.get_masked_triangles()
+    #triangles = triangulation.triangles()
     polygons = []
-
+    print(triangles)
     for triangle in triangles:
-        self.w.create_polygon([xarray[triangle[0]], 1000 - yarray[triangle[0]]], [xarray[triangle[1]], 1000 - yarray[triangle[1]]], [xarray[triangle[2]], 1000 - yarray[triangle[2]]], fill=random.choice(color))
-        print(xarray[triangle[0])
+        x1 = xarray[triangle[0]]
+        y1 = yarray[triangle[0]]
+        x2 = xarray[triangle[1]]
+        y2 = yarray[triangle[1]]
+        x3 = xarray[triangle[2]]
+        y3 = yarray[triangle[2]]
+        circle = np.array([[x1, y1], [x2, y2], [x3, y3]])
+        self.w.create_polygon([x1, y1], [x2, y2], [x3, y3], fill=random.choice(color))
+
+
+
+
     #plt.figure()
     #plt.gca().set_aspect('equal')
     #plt.triplot(triangulation)
