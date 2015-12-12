@@ -72,6 +72,55 @@ def drawPerpendicularBisector(pt1, pt2, beginning, finish):
     voronoiLines.append(Line(start, end))
     return Line(Point(start.x, start.y), Point(end.x, end.y))
 
+def intersects(pt1, pt2, pt3, pt4): # Always check the third element!
+    line1= []
+    line2 = []
+    line1.append([pt1[0], pt1[1]])
+    line1.append([pt2[0], pt2[1]])
+    line2.append([pt3[0], pt3[1]])
+    line2.append([pt1[0], pt1[1]])
+    xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
+    ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1]) #Typo was here
+
+    def det(a, b):
+        return a[0] * b[1] - a[1] * b[0]
+
+    div = det(xdiff, ydiff)
+    if div == 0:
+       return[0, 0, False]
+
+    d = (det(*line1), det(*line2))
+    x = det(d, xdiff) / div
+    y = det(d, ydiff) / div
+    return [x, y, True]
+
+def circumcenter(A, B, C):
+    a = B[0] - A[0]
+    b = B[1] - A[1]
+    c = C[0] - A[0]
+    d = C[1] - A[1]
+    e = a* (A[0] + B[0]) + b * (A[1] + B[1])
+    f = c *(A[0] + C[0]) + d * (A[1] + C[1])
+    g = 2 * (a * (C[1] - B[1]) - b * (C[0] - B[0]))
+    if(abs(g) < 0.000001):
+        minx = min(A[0], B[0], C[0])
+        miny = min(A[1], B[1], C[1])
+        dx = (max(A[0], B[0], C[0]) - minx) * 0.5
+        dy = (max(A[1], B[1], C[1]) - miny) * 0.5
+        xvalue = minx + dx
+        yvalue = miny + dy
+        radius = sqrt(dx * dx + dy * dy)
+        return [xvalue, yvalue, radius]
+    else:
+        xvalue = (d*e - b*f) / g
+        yvalue = (a*f - c*e) / g
+        dx = xvalue - A[0]
+        dy = yvalue - A[1]
+        radius = sqrt(dx * dx + dy * dy)
+        return [xvalue, yvalue, radius]
+
+def create_circle(self, x, y, r, **kwargs):
+    return self.create_oval(x-r, y-r, x+r, y+r, **kwargs)
 
 def distance(pt1, pt2):
     return math.hypot(pt2.x-pt1.x, pt2.y-pt1.y)
@@ -156,62 +205,6 @@ def reload(self, imageName):
     #for line in voronoiLines:
     #    print("(",line.start.x,",", line.start.y, ") to (", line.end.x, ",", line.end.y,")")
 
-def intersects(l1, l2):
-    l1_start = l1.start
-    l1_end = l1.end
-    l2_start = l2.start
-    l2_end = l2.end
-
-    l1_startx = l1_start.x
-    l1_starty = l1_start.y
-
-    l2_startx = l2_start.x
-    l2_starty = l2_start.y
-
-    l1_endx = l1_end.x
-    l1_endy = l1_end.y
-
-    l2_endx = l2_end.x
-    l2_endy = l2_end.y
-
-    m1 = (l1_starty - l1_endy) / (l1_startx - l1_endx)
-    m2 = (l2_starty - l2_endy) / (l2_startx - l2_endx)
-
-    b1 = l1_starty - m1*l1_startx
-    b2 = l2_starty - m2*l2_startx
-
-    if m1==m2 & b1 != b2:
-        return False
-    else:
-        return True
-
-def circumcenter(A, B, C):
-    a = B[0] - A[0]
-    b = B[1] - A[1]
-    c = C[0] - A[0]
-    d = C[1] - A[1]
-    e = a* (A[0] + B[0]) + b * (A[1] + B[1])
-    f = c *(A[0] + C[0]) + d * (A[1] + C[1])
-    g = 2 * (a * (C[1] - B[1]) - b * (C[0] - B[0]))
-    if(abs(g) < 0.000001):
-        minx = min(A[0], B[0], C[0])
-        miny = min(A[1], B[1], C[1])
-        dx = (max(A[0], B[0], C[0]) - minx) * 0.5
-        dy = (max(A[1], B[1], C[1]) - miny) * 0.5
-        xvalue = minx + dx
-        yvalue = miny + dy
-        radius = sqrt(dx * dx + dy * dy)
-        return [xvalue, yvalue, radius]
-    else:
-        xvalue = (d*e - b*f) / g
-        yvalue = (a*f - c*e) / g
-        dx = xvalue - A[0]
-        dy = yvalue - A[1]
-        radius = sqrt(dx * dx + dy * dy)
-        return [xvalue, yvalue, radius]
-
-def create_circle(self, x, y, r, **kwargs):
-    return self.create_oval(x-r, y-r, x+r, y+r, **kwargs)
 
 def window_close():
     root.destroy()
