@@ -3,6 +3,7 @@ __author__ = 'Amy Shi, Amber Lee, Fred Ayi-Quaye'
 from tkinter import *
 import random
 import math
+from math import sqrt
 import time
 import doctest
 from itertools import permutations
@@ -137,9 +138,11 @@ def reload(self, imageName):
         y2 = yarray[triangle[1]]
         x3 = xarray[triangle[2]]
         y3 = yarray[triangle[2]]
-        circle = np.array([[x1, y1], [x2, y2], [x3, y3]])
         #print(circumcircle(circle))
         self.w.create_polygon([x1, y1], [x2, y2], [x3, y3], fill=random.choice(color))
+        center = circumcenter([x1, y1], [x2, y2], [x3, y3])
+        self.w.create_oval(center[0]-1, center[1]-1, center[0]+1, center[1]+1, fill="black")
+        create_circle(self.w, center[0], center[1], center[2])
 
 
 
@@ -182,15 +185,33 @@ def intersects(l1, l2):
     else:
         return True
 
-#def circumcircle(T):
-#    P1,P2,P3=T[:,0], T[:,1], T[:,2]
-#    b = P2 - P1
-#    c = P3 - P1
-#    d=2*(b[:,0]*c[:,1]-b[:,1]*c[:,0])
-#    center_x=(c[:,1]*(np.square(b[:,0])+np.square(b[:,1]))- b[:,1]*(np.square(c[:,0])+np.square(c[:,1])))/d + P1[:,0]
-#    center_y=(b[:,0]*(np.square(c[:,0])+np.square(c[:,1]))- c[:,0]*(np.square(b[:,0])+np.square(b[:,1])))/d + P1[:,1]
-#    return np.array((center_x, center_y)).T
+def circumcenter(A, B, C):
+    a = B[0] - A[0]
+    b = B[1] - A[1]
+    c = C[0] - A[0]
+    d = C[1] - A[1]
+    e = a* (A[0] + B[0]) + b * (A[1] + B[1])
+    f = c *(A[0] + C[0]) + d * (A[1] + C[1])
+    g = 2 * (a * (C[1] - B[1]) - b * (C[0] - B[0]))
+    if(abs(g) < 0.000001):
+        minx = min(A[0], B[0], C[0])
+        miny = min(A[1], B[1], C[1])
+        dx = (max(A[0], B[0], C[0]) - minx) * 0.5
+        dy = (max(A[1], B[1], C[1]) - miny) * 0.5
+        xvalue = minx + dx
+        yvalue = miny + dy
+        radius = sqrt(dx * dx + dy * dy)
+        return [xvalue, yvalue, radius]
+    else:
+        xvalue = (d*e - b*f) / g
+        yvalue = (a*f - c*e) / g
+        dx = xvalue - A[0]
+        dy = yvalue - A[1]
+        radius = sqrt(dx * dx + dy * dy)
+        return [xvalue, yvalue, radius]
 
+def create_circle(self, x, y, r, **kwargs):
+    return self.create_oval(x-r, y-r, x+r, y+r, **kwargs)
 
 def window_close():
     root.destroy()
