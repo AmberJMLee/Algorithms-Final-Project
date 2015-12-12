@@ -115,20 +115,21 @@ def reload(self, imageName):
     for x in range(width):
         for y in range(height):
             cpixel = pixels[x, y]
+            #print(cpixel)
             foo = random.randint(1, 7)
             if (round(sum(cpixel)) / float(len(cpixel)) > 127) & (x%foo == 0) & (y%foo == 0):
                 all_pixels.append(255)
-                points.append(Point(x*2, y*2))
-                xarray.append(x*2)
-                yarray.append(y*2)
+                points.append(Point(x*3, y*3))
+                xarray.append(x*3)
+                yarray.append(y*3)
                 #self.w.create_oval(x*2, y*2, x*2+1, y*2+1, fill="black")
             else:
                 all_pixels.append(0)
+            #print(all_pixels)
     triangulation = Triangulation(xarray, yarray)
     triangles = triangulation.get_masked_triangles()
     #triangles = triangulation.triangles()
-    polygons = []
-    print(triangles)
+    #print(triangles)
     for triangle in triangles:
         x1 = xarray[triangle[0]]
         y1 = yarray[triangle[0]]
@@ -137,6 +138,7 @@ def reload(self, imageName):
         x3 = xarray[triangle[2]]
         y3 = yarray[triangle[2]]
         circle = np.array([[x1, y1], [x2, y2], [x3, y3]])
+        #print(circumcircle(circle))
         self.w.create_polygon([x1, y1], [x2, y2], [x3, y3], fill=random.choice(color))
 
 
@@ -180,6 +182,15 @@ def intersects(l1, l2):
     else:
         return True
 
+#def circumcircle(T):
+#    P1,P2,P3=T[:,0], T[:,1], T[:,2]
+#    b = P2 - P1
+#    c = P3 - P1
+#    d=2*(b[:,0]*c[:,1]-b[:,1]*c[:,0])
+#    center_x=(c[:,1]*(np.square(b[:,0])+np.square(b[:,1]))- b[:,1]*(np.square(c[:,0])+np.square(c[:,1])))/d + P1[:,0]
+#    center_y=(b[:,0]*(np.square(c[:,0])+np.square(c[:,1]))- c[:,0]*(np.square(b[:,0])+np.square(b[:,1])))/d + P1[:,1]
+#    return np.array((center_x, center_y)).T
+
 
 def window_close():
     root.destroy()
@@ -187,5 +198,5 @@ def window_close():
 root = Tk()
 Window()
 root.title("Voronoi Painting")
-root.geometry("500x500")
+root.geometry("1000x600")
 root.mainloop()
