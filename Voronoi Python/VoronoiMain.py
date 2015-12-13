@@ -4,17 +4,17 @@ from tkinter import *
 import random
 import math
 from math import sqrt
-import time
-import doctest
-from itertools import permutations
 from PIL import Image
 from voronoiCell import *
 from matplotlib.tri import Triangulation
 import numpy as np
-
+np.set_printoptions(threshold=np.nan)
 voronoiLines = [] #This will contain all of the lines that were generated from the Green and Gibson algorithm
 voronoiCells = []
+voronoiCircles = []
 
+def voronoi(triangles):
+    return 0;
 #This draws a perpendicular line between all points that are closest to each other.
 def nearestDistanceConnect(points, w):
     for point in points:
@@ -138,11 +138,14 @@ class Window():
         self.entry.pack(side=TOP,padx=10,pady=10)
         def onok():
             imageName = self.entry.get()
-            #print(imageName)
-            reload(self, imageName)
+            caller(imageName)
+            #reload(self, imageName)
             self.w.after(100, onok)
+        def caller(imageName):
+            reload(self, imageName)
+            self.w.after(50, onok)
         Button(root, text='Exit', command=window_close).pack(side=BOTTOM)
-        Button(root, text='Add image file', command=onok).pack(side=BOTTOM)
+        Button(root, text='Add image file', command=onok).pack()
         self.w = Canvas(root, width=1000, height=1000)
         self.w.pack()
 
@@ -152,8 +155,10 @@ def reload(self, imageName):
     self.w.delete("all")
     #Let's create an image
     image = Image.open(imageName)
+    colors = []
     pixels = image.load()
     width, height = image.size
+    print(width)
     #Just a testing data structure. Don't use this.
     all_pixels = []
     #Use this one when doing calculations.
@@ -165,17 +170,21 @@ def reload(self, imageName):
     for x in range(width):
         for y in range(height):
             cpixel = pixels[x, y]
+            #colors.append(cpixel)
             #print(cpixel)
-            foo = random.randint(1, 7)
-            if (round(sum(cpixel)) / float(len(cpixel)) > 127) & (x%foo == 0) & (y%foo == 0):
+            foo = random.randint(1, 10)
+            #if (round(sum(cpixel)) / float(len(cpixel)) > 127) & (x%foo == 0) & (y%foo == 0):
+            if ( x%foo == 0) and (y%foo == 0):
                 all_pixels.append(255)
                 points.append(Point(x*3, y*3))
                 xarray.append(x*3)
                 yarray.append(y*3)
+                colors.append(cpixel)
                 #self.w.create_oval(x*2, y*2, x*2+1, y*2+1, fill="black")
-            else:
-                all_pixels.append(0)
+            #else:
+             #   all_pixels.append(0)
             #print(all_pixels)
+
     triangulation = Triangulation(xarray, yarray)
     triangles = triangulation.get_masked_triangles()
     #triangles = triangulation.triangles()
@@ -188,22 +197,57 @@ def reload(self, imageName):
         x3 = xarray[triangle[2]]
         y3 = yarray[triangle[2]]
         #print(circumcircle(circle))
-        self.w.create_polygon([x1, y1], [x2, y2], [x3, y3], fill=random.choice(color))
+        #red= colors[triangle[0]][0]
+        try:
+            red=colors[triangle[0]][0]
+            green= colors[triangle[0]][1]
+            blue= colors[triangle[0]][2]
+            mycolor = '#%02x%02x%02x' % (red, green, blue)
+        except IndexError:
+            if colors[triangle[0]][1] > 100:
+                mycolor='black'
+            else:
+                mycolor='white'
+        self.w.create_polygon([x1, y1], [x2, y2], [x3, y3], fill=mycolor)
         center = circumcenter([x1, y1], [x2, y2], [x3, y3])
-        self.w.create_oval(center[0]-1, center[1]-1, center[0]+1, center[1]+1, fill="black")
-        create_circle(self.w, center[0], center[1], center[2])
-
-
-
-
-    #plt.figure()
-    #plt.gca().set_aspect('equal')
-    #plt.triplot(triangulation)
-    #plt.title("Triangulation")
-    #plt.show()
-    #nearestDistanceConnect(points, self.w)
-    #for line in voronoiLines:
-    #    print("(",line.start.x,",", line.start.y, ") to (", line.end.x, ",", line.end.y,")")
+        bisector1 = [[(x1+x2)/2], [(y1+y2)/2]]
+        bisector2 = [[(x2+x3)/2], [(y2+y3)/2]]
+        bisector3 = [[(x3+x1)/2], [(y3+y1)/2]]
+        self.w.create_line(center[0], center[1], bisector1[0], bisector1[1])
+        self.w.create_line(center[0], center[1], bisector2[0], bisector2[1])
+        self.w.create_line(center[0], center[1], bisector3[0], bisector3[1])
+        #self.w.create_oval(center[0]-1, center[1]-1, center[0]+1, center[1]+1, fill="black")
+        #create_circle(self.w, center[0], center[1], center[2])
+        #voronoiCircles.append(center)
+        """
+        if len(voronoiCells) == 0:
+            voronoiCells.append(Cell([x1, y1], [[x2, y2], [x3, y3]]))
+            voronoiCells.append(Cell([x2, y2], [[x1, y1], [x3, y3]]))
+            voronoiCells.append(Cell([x3, y3], [[x1, y1], [x2, y2]]))
+        for voronoiCell in voronoiCells:
+            if voronoiCell.shares(x1, y1):
+                voronoiCell.adjacent.append([x2, y2])
+                voronoiCell.adjacent.append([x3, y3])
+            if voronoiCell.shares(x2, y2):
+                voronoiCell.adjacent.append([x1, y1])
+                voronoiCell.adjacent.append([x3, y3])
+            if voronoiCell.shares(x3, y3):
+                voronoiCell.adjacent.append([x1, y1])
+                voronoiCell.adjacent.append([x2, y2])
+            else:
+                voronoiCells.append(Cell([x1, y1], [[x2, y2], [x3, y3]]))
+                voronoiCells.append(Cell([x2, y2], [[x1, y1], [x3, y3]]))
+                voronoiCells.append(Cell([x3, y3], [[x1, y1], [x2, y2]]))
+            #print("Hello")
+    print(points)
+    for voronoiCell in voronoiCells:
+        points = []
+        for adjacent in voronoiCell.adjacent:
+            points.append(intersects(drawPerpendicular([voronoiCell.center[0], voronoiCell.center[1]]), drawPerpendicular(adjacent[0], adjacent[1])))
+        self.w.create_polygon(self, [points[0][0], points[0][1]], [points[1][0], points[1][1]], [points[2][0], points[2][1]], fill="black")
+        #print(points)
+        #print("Hello")
+    """
 
 
 def window_close():
