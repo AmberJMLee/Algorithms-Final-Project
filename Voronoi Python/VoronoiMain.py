@@ -213,9 +213,10 @@ def reload(self, imageName):
         bisector1 = [[(x1+x2)/2], [(y1+y2)/2]]
         bisector2 = [[(x2+x3)/2], [(y2+y3)/2]]
         bisector3 = [[(x3+x1)/2], [(y3+y1)/2]]
-        self.w.create_line(center[0], center[1], bisector1[0], bisector1[1])
-        self.w.create_line(center[0], center[1], bisector2[0], bisector2[1])
-        self.w.create_line(center[0], center[1], bisector3[0], bisector3[1])
+        if (center[0] < width * 3) & (center[1] < height * 3):
+            self.w.create_line(center[0], center[1], bisector1[0], bisector1[1])
+            self.w.create_line(center[0], center[1], bisector2[0], bisector2[1])
+            self.w.create_line(center[0], center[1], bisector3[0], bisector3[1])
         #self.w.create_oval(center[0]-1, center[1]-1, center[0]+1, center[1]+1, fill="black")
         #create_circle(self.w, center[0], center[1], center[2])
         #voronoiCircles.append(center)
