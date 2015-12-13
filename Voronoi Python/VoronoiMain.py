@@ -9,10 +9,11 @@ from voronoiCell import *
 from matplotlib.tri import Triangulation
 import numpy as np
 np.set_printoptions(threshold=np.nan)
-voronoiLines = [] #This will contain all of the lines that were generated from the Green and Gibson algorithm
-voronoiCells = []
-voronoiCircles = []
-
+ #This will contain all of the lines that were generated from the Green and Gibson algorithm
+#voronoiCells = []
+animate = False
+#scale = 3
+#seed = 7
 def voronoi(triangles):
     return 0;
 #This draws a perpendicular line between all points that are closest to each other.
@@ -52,7 +53,8 @@ def drawPerpendicular(pt1, pt2, w):
         end.x = centerX
         end.y = centerY - rightsize
     w.create_line(start.x, start.y, end.x, end.y, fill="red", width=1)
-    voronoiLines.append(Line(start, end))
+    #voronoiLines = []
+    #voronoiLines.append(Line(start, end))
 
 def drawPerpendicularBisector(pt1, pt2, beginning, finish):
     centerX = (pt1.x + pt2.x) / 2
@@ -69,7 +71,7 @@ def drawPerpendicularBisector(pt1, pt2, beginning, finish):
         start.y = beginning.y
         end.x = centerY
         end.y = end.y
-    voronoiLines.append(Line(start, end))
+    #voronoiLines.append(Line(start, end))
     return Line(Point(start.x, start.y), Point(end.x, end.y))
 
 def intersects(pt1, pt2, pt3, pt4): # Always check the third element!
@@ -128,98 +130,127 @@ def distance(pt1, pt2):
 class Window():
     def __init__(self):
         #Let's create a text button
-        self.T = Text(root, height=2, width=50)
-        self.T.pack()
-        Label(text="Welcome to the Voronoi Painter.").pack(side=TOP, padx=10, pady=10)
+        #self.T = Text(root, height=2, width=50)
+        #self.T.pack()
+        Label(text="Welcome to the Voronoi Painter.").pack(side=TOP)
 
         #Let's create a textbox
-        Label(text='Please enter an image file to use and press button.').pack(side=TOP,padx=10,pady=10)
-        self.entry = Entry(root, width=50)
-        self.entry.pack(side=TOP,padx=10,pady=10)
+        #Label(text='Please enter an image file to use and press button.').pack(side=TOP,padx=10,pady=10)
         def onok():
             imageName = self.entry.get()
-            caller(imageName)
-            #reload(self, imageName)
-            #self.w.after(100, onok)
-        def caller(imageName):
-            reload(self, imageName)
-            self.w.after(50, onok)
+            seed = self.seed.get()
+            scale = self.scale.get()
+            #caller(imageName, seed, scale)
+            reload(self, imageName, int(seed), int(scale))
+            if animate == True:
+                self.w.after(100, onok)
+        def animateit():
+            global animate
+            animate = True
+            onok()
+        #def caller(imageName, seed, scale):
+        #    try:
+        #        reload(self, imageName, seed, scale)
+        #        self.w.after(50, caller(imageName, seed, scale))
+        #    except (AttributeError, IOError, FileNotFoundError):
+        #        print("No")
+        #This represents the left column.
+        self.group = LabelFrame()
+        self.group.pack(side=LEFT)
+        Label(self.group, text='Project created by Amber Lee, Amy Shi, and Fred Ayi-Quaye').pack()
+        Label(self.group).pack()
+        Label(self.group, text='Image File').pack()
+        self.entry = Entry(self.group, width=50)
+        self.entry.insert(0, 'kitten.png')
+        self.entry.pack()
+        Label(self.group, text='Seed for number of data points').pack()
+        self.seed = Entry(self.group, width=25)
+        self.seed.insert(0, '7')
+        self.seed.pack()
+        Label(self.group, text='Image scale').pack()
+        self.scale = Entry(self.group, width=25)
+        self.scale.insert(0, '3')
+        self.scale.pack()
+        Button(self.group, text='Add image file', command=onok).pack()
         Button(root, text='Exit', command=window_close).pack(side=BOTTOM)
-        Button(root, text='Add image file', command=onok).pack()
-        self.w = Canvas(root, width=1000, height=1000)
+        Button(self.group, text='Animate', command=animateit).pack()
+        self.w = Canvas(root, width=1000, height=1000, bg='black')
+        self.w.pack(side=RIGHT)
+
+def reload(self, imageName, seed, scale):
+    try:
+        #Let's create a canvas
+
+        #voronoiCircles = []
         self.w.pack()
+        self.w.delete("all")
+        #Let's create an image
+        image = Image.open(imageName)
+        colors = []
+        pixels = image.load()
+        width, height = image.size
+        #print(width)
+        #Just a testing data structure. Don't use this.
+        all_pixels = []
+        #Use this one when doing calculations.
+        points = []
+        xarray = []
+        yarray = []
+        color = ["red", "orange", "yellow", "green", "blue", "violet"]
+        #loop(self, points, pixels, all_pixels, width, height)
+        for x in range(width):
+            for y in range(height):
+                cpixel = pixels[x, y]
+                #colors.append(cpixel)
+                #print(cpixel)
+                foo = random.randint(1, seed)
+                #if (round(sum(cpixel)) / float(len(cpixel)) > 127) & (x%foo == 0) & (y%foo == 0):
+                if ( x%foo == 0) and (y%foo == 0):
+                    all_pixels.append(255)
+                    points.append(Point(x*scale, y*scale))
+                    xarray.append(x*scale)
+                    yarray.append(y*scale)
+                    colors.append(cpixel)
+                    #self.w.create_oval(x*2, y*2, x*2+1, y*2+1, fill="black")
+                #else:
+                 #   all_pixels.append(0)                #print(all_pixels)
 
-def reload(self, imageName):
-    #Let's create a canvas
-    self.w.pack()
-    self.w.delete("all")
-    #Let's create an image
-    image = Image.open(imageName)
-    colors = []
-    pixels = image.load()
-    width, height = image.size
-    #print(width)
-    #Just a testing data structure. Don't use this.
-    all_pixels = []
-    #Use this one when doing calculations.
-    points = []
-    xarray = []
-    yarray = []
-    color = ["red", "orange", "yellow", "green", "blue", "violet"]
-    #loop(self, points, pixels, all_pixels, width, height)
-    for x in range(width):
-        for y in range(height):
-            cpixel = pixels[x, y]
-            #colors.append(cpixel)
-            #print(cpixel)
-            foo = random.randint(1, 10)
-            #if (round(sum(cpixel)) / float(len(cpixel)) > 127) & (x%foo == 0) & (y%foo == 0):
-            if ( x%foo == 0) and (y%foo == 0):
-                all_pixels.append(255)
-                points.append(Point(x*3, y*3))
-                xarray.append(x*3)
-                yarray.append(y*3)
-                colors.append(cpixel)
-                #self.w.create_oval(x*2, y*2, x*2+1, y*2+1, fill="black")
-            #else:
-             #   all_pixels.append(0)
-            #print(all_pixels)
-
-    triangulation = Triangulation(xarray, yarray)
-    triangles = triangulation.get_masked_triangles()
-    #triangles = triangulation.triangles()
-    #print(triangles)
-    for triangle in triangles:
-        x1 = xarray[triangle[0]]
-        y1 = yarray[triangle[0]]
-        x2 = xarray[triangle[1]]
-        y2 = yarray[triangle[1]]
-        x3 = xarray[triangle[2]]
-        y3 = yarray[triangle[2]]
-        #print(circumcircle(circle))
-        #red= colors[triangle[0]][0]
-        try:
-            red=colors[triangle[0]][0]
-            green= colors[triangle[0]][1]
-            blue= colors[triangle[0]][2]
-            mycolor = '#%02x%02x%02x' % (red, green, blue)
-        except IndexError:
-            if colors[triangle[0]][1] > 100:
-                mycolor='black'
-            else:
-                mycolor='white'
-        self.w.create_polygon([x1, y1], [x2, y2], [x3, y3], fill=mycolor)
-        center = circumcenter([x1, y1], [x2, y2], [x3, y3])
-        bisector1 = [[(x1+x2)/2], [(y1+y2)/2]]
-        bisector2 = [[(x2+x3)/2], [(y2+y3)/2]]
-        bisector3 = [[(x3+x1)/2], [(y3+y1)/2]]
-        if (center[0] < width * 3) & (center[1] < height * 3):
+        triangulation = Triangulation(xarray, yarray)
+        triangles = triangulation.get_masked_triangles()
+        #triangles = triangulation.triangles()
+        #print(triangles)
+        for triangle in triangles:
+            x1 = xarray[triangle[0]]
+            y1 = yarray[triangle[0]]
+            x2 = xarray[triangle[1]]
+            y2 = yarray[triangle[1]]
+            x3 = xarray[triangle[2]]
+            y3 = yarray[triangle[2]]
+            #print(circumcircle(circle))
+            #red= colors[triangle[0]][0]
+            try:
+                red=colors[triangle[0]][0]
+                green= colors[triangle[0]][1]
+                blue= colors[triangle[0]][2]
+                mycolor = '#%02x%02x%02x' % (red, green, blue)
+            except IndexError:
+                if colors[triangle[0]][1] > 100:
+                    mycolor='black'
+                else:
+                    mycolor='white'
+            self.w.create_polygon([x1, y1], [x2, y2], [x3, y3], fill=mycolor)
+            center = circumcenter([x1, y1], [x2, y2], [x3, y3])
+            bisector1 = [[(x1+x2)/2], [(y1+y2)/2]]
+            bisector2 = [[(x2+x3)/2], [(y2+y3)/2]]
+            bisector3 = [[(x3+x1)/2], [(y3+y1)/2]]
             self.w.create_line(center[0], center[1], bisector1[0], bisector1[1])
             self.w.create_line(center[0], center[1], bisector2[0], bisector2[1])
             self.w.create_line(center[0], center[1], bisector3[0], bisector3[1])
-        #self.w.create_oval(center[0]-1, center[1]-1, center[0]+1, center[1]+1, fill="black")
-        #create_circle(self.w, center[0], center[1], center[2])
-        #voronoiCircles.append(center)
+            #self.w.create_oval(center[0]-1, center[1]-1, center[0]+1, center[1]+1, fill="black")
+            #create_circle(self.w, center[0], center[1], center[2])
+            #voronoiCircles.append(center)
+    except (AttributeError, IOError, FileNotFoundError):
+        pass
         """
         if len(voronoiCells) == 0:
             voronoiCells.append(Cell([x1, y1], [[x2, y2], [x3, y3]]))
