@@ -148,6 +148,9 @@ class Window():
             global animate
             animate = True
             onok()
+        def halt():
+            global animate
+            animate = False
         #def caller(imageName, seed, scale):
         #    try:
         #        reload(self, imageName, seed, scale)
@@ -163,7 +166,7 @@ class Window():
         self.entry = Entry(self.group, width=50)
         self.entry.insert(0, 'kitten.png')
         self.entry.pack()
-        Label(self.group, text='Seed for number of data points').pack()
+        Label(self.group, text='Data point scale').pack()
         self.seed = Entry(self.group, width=25)
         self.seed.insert(0, '7')
         self.seed.pack()
@@ -171,9 +174,10 @@ class Window():
         self.scale = Entry(self.group, width=25)
         self.scale.insert(0, '3')
         self.scale.pack()
-        Button(self.group, text='Add image file', command=onok).pack()
+        Button(self.group, text='Generate Voronoi Painting', command=onok).pack()
         Button(root, text='Exit', command=window_close).pack(side=BOTTOM)
-        Button(self.group, text='Animate', command=animateit).pack()
+        Button(self.group, text='Animate it!', command=animateit).pack()
+        Button(self.group, text='Stop animation...', command=halt).pack()
         self.w = Canvas(root, width=1000, height=1000, bg='black')
         self.w.pack(side=RIGHT)
 
