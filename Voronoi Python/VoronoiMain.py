@@ -140,7 +140,7 @@ class Window():
             imageName = self.entry.get()
             caller(imageName)
             #reload(self, imageName)
-            self.w.after(100, onok)
+            #self.w.after(100, onok)
         def caller(imageName):
             reload(self, imageName)
             self.w.after(50, onok)
@@ -158,7 +158,7 @@ def reload(self, imageName):
     colors = []
     pixels = image.load()
     width, height = image.size
-    print(width)
+    #print(width)
     #Just a testing data structure. Don't use this.
     all_pixels = []
     #Use this one when doing calculations.
